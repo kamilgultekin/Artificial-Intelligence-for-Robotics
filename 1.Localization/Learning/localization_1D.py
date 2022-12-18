@@ -5,7 +5,7 @@ import matplotlib.animation as animation
 from matplotlib.colors import from_levels_and_colors
 
 #Number of grid cells
-n_cells = 25
+n_cells = 50
 
 #Probability of hitting the target
 p_hit = 0.6
