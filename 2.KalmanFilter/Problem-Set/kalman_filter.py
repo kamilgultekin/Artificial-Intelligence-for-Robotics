@@ -20,7 +20,7 @@ class matrix:
     def zero(self, dimx, dimy):
         # check if valid dimensions
         if dimx < 1 or dimy < 1:
-            raise ValueError, "Invalid size of matrix"
+            raise ValueError("Invalid size of matrix")
         else:
             self.dimx = dimx
             self.dimy = dimy
@@ -29,7 +29,7 @@ class matrix:
     def identity(self, dim):
         # check if valid dimension
         if dim < 1:
-            raise ValueError, "Invalid size of matrix"
+            raise ValueError("Invalid size of matrix")
         else:
             self.dimx = dim
             self.dimy = dim
@@ -39,13 +39,13 @@ class matrix:
     
     def show(self):
         for i in range(self.dimx):
-            print self.value[i]
-        print ' '
+            print(self.value[i])
+        print(' ')
     
     def __add__(self, other):
         # check if correct dimensions
         if self.dimx != other.dimx or self.dimy != other.dimy:
-            raise ValueError, "Matrices must be of equal dimensions to add"
+            raise ValueError("Matrices must be of equal dimensions to add")
         else:
             # add if correct dimensions
             res = matrix([[]])
@@ -58,7 +58,7 @@ class matrix:
     def __sub__(self, other):
         # check if correct dimensions
         if self.dimx != other.dimx or self.dimy != other.dimy:
-            raise ValueError, "Matrices must be of equal dimensions to subtract"
+            raise ValueError("Matrices must be of equal dimensions to subtract")
         else:
             # subtract if correct dimensions
             res = matrix([[]])
@@ -71,7 +71,7 @@ class matrix:
     def __mul__(self, other):
         # check if correct dimensions
         if self.dimy != other.dimx:
-            raise ValueError, "Matrices must be m*n and n*p to multiply"
+            raise ValueError("Matrices must be m*n and n*p to multiply")
         else:
             # subtract if correct dimensions
             res = matrix([[]])
@@ -106,7 +106,7 @@ class matrix:
                 res.value[i][i] = 0.0
             else:
                 if d < 0.0:
-                    raise ValueError, "Matrix not positive-definite"
+                    raise ValueError("Matrix not positive-definite")
                 res.value[i][i] = sqrt(d)
             for j in range(i+1, self.dimx):
                 S = sum([res.value[k][i] * res.value[k][j] for k in range(self.dimx)])
@@ -115,7 +115,7 @@ class matrix:
                 try:
                    res.value[i][j] = (self.value[i][j] - S)/res.value[i][i]
                 except:
-                   raise ValueError, "Zero diagonal"
+                   raise ValueError("Zero diagonal")
         return res
     
     def CholeskyInverse(self):
@@ -140,57 +140,3 @@ class matrix:
     
     def __repr__(self):
         return repr(self.value)
-
-
-########################################
-
-def filter(x, P):
-    for n in range(len(measurements)):
-        
-        # prediction
-        x = (F * x) + u
-        P = F * P * F.transpose()
-        
-        # measurement update
-        Z = matrix([measurements[n]])
-        y = Z.transpose() - (H * x)
-        S = H * P * H.transpose() + R
-        K = P * H.transpose() * S.inverse()
-        x = x + (K * y)
-        P = (I - (K * H)) * P
-    
-    print 'x= '
-    x.show()
-    print 'P= '
-    P.show()
-
-########################################
-
-print "### 4-dimensional example ###"
-
-measurements = [[5., 10.], [6., 8.], [7., 6.], [8., 4.], [9., 2.], [10., 0.]]
-initial_xy = [4., 12.]
-
-# measurements = [[1., 4.], [6., 0.], [11., -4.], [16., -8.]]
-# initial_xy = [-4., 8.]
-
-# measurements = [[1., 17.], [1., 15.], [1., 13.], [1., 11.]]
-# initial_xy = [1., 19.]
-
-dt = 0.1
-
-x = matrix([[initial_xy[0]], [initial_xy[1]], [0.], [0.]]) # initial state (location and velocity)
-u = matrix([[0.], [0.], [0.], [0.]]) # external motion
-
-#### DO NOT MODIFY ANYTHING ABOVE HERE ####
-#### fill this in, remember to use the matrix() function!: ####
-
-P = matrix([[0., 0., 0., 0.], [0., 0., 0., 0.], [0., 0., 1000., 0.,], [0., 0., 0., 1000.,]]) # initial uncertainty: 0 for positions x and y, 1000 for the two velocities
-F = matrix([[1., 0., dt, 0.], [0., 1., 0., dt], [0., 0., 1., 0.], [0., 0., 0., 1.]]) # next state function: generalize the 2d version to 4d
-H = matrix([[1., 0., 0., 0.], [0., 1., 0., 0.]]) # measurement function: reflect the fact that we observe x and y but not the two velocities
-R = matrix([[.1, 0.], [0, .1]]) # measurement uncertainty: use 2x2 matrix with 0.1 as main diagonal
-I = matrix([[1., 0., 0., 0.], [0., 1., 0., 0.], [0., 0., 1., 0.], [0., 0., 0., 1.]]) # 4d identity matrix
-
-###### DO NOT MODIFY ANYTHING HERE #######
-
-filter(x, P)
