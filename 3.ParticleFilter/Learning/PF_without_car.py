@@ -94,34 +94,37 @@ def resample(p, w):
         new_p.append(p[index])
     return new_p
 
-fig, ax = plt.subplots()
-robot = Robot()
-robot.set_pose(50, 50, 0)
-particles = [Robot() for _ in range(N)]
-weights = [0 for _ in range(N)]
+fig, ax = plt.subplots() # for animation
+robot = Robot() # call for robot
+robot.set_pose(50, 50, 0) # set the initial position
+particles = [Robot() for _ in range(N)] # set N particles randomly
+weights = [0 for _ in range(N)] # set weights with zero values
+# For animation
 robo_dot, = ax.plot(0, 0, 'ro')
 sense_lines = [ax.plot([0, 0], [0, 0], 'k--') for _ in landmarks]
 particle_dots = [ax.plot(0, 0, '.') for _ in range(N)]
+
 def animate(_):
     global particles, weights, robot
     w = []
-    robot = robot.move(random.uniform(0,0.1), random.uniform(0,1))
-    Z = robot.sense()
-    robo_dot.set_data(robot.x, robot.y)
-    for i in range(N):
-        p = particles[i].move(random.uniform(0,0.1), random.uniform(0,1))
+    rand_turn = random.uniform(0,0.1) # Random orientation 
+    rand_forward = random.uniform(0,1) # Random forward
+    robot = robot.move(rand_turn,rand_forward) # robot moves with random from rand_turn and rand_forward
+    Z = robot.sense() # Calculate eucledian distance from landmarks
+    robo_dot.set_data(robot.x, robot.y) # set robots position
+    for i in range(N): # measurement from particle filters
+        p = particles[i].move(rand_turn, rand_forward)
         particles[i] = p
         weights[i] = p.measurement_prob(Z)
         particle_dots[i][0].set_data(p.x, p.y)
     norm = sum(weights)
     weights = [w/norm for w in weights]
     particles = resample(particles, weights)
-    for i in range(len(landmarks)):
+    for i in range(len(landmarks)): # visualization
         sense_lines[i][0].set_data([robot.x, landmarks[i][0]], [robot.y, landmarks[i][1]])
         sense_lines[i][0].set_color('blue')
         sense_lines[i][0].set_linewidth(0.8)
         sense_lines[i][0].set_alpha(0.5)
-    input()
     return robo_dot, particle_dots, sense_lines
 
 def init():
