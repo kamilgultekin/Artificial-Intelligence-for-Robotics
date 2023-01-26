@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
 #Number of grid cells
-m, n = 10, 10
+m, n = 50, 50
 
 #Probability of hitting the target
 p = [[1/(m*n) for _ in range(n)] for _ in range(m)]
@@ -104,7 +104,6 @@ def animate(_):
     grid.set_clim(vmin=smallest, vmax=largest)
     line.set_xdata(j)
     line.set_ydata(i)
-    input()
     return grid, line,
 
 def init(): 
