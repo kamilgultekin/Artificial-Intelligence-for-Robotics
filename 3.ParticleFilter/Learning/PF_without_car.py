@@ -134,6 +134,6 @@ def init():
         ax.plot(lm[0], lm[1], 'g*')
     return robo_dot, particle_dots, 
 
-anim = animation.FuncAnimation(fig, animate, 250, interval=500, init_func=init)
+anim = animation.FuncAnimation(fig, animate, 250, interval=100, init_func=init)
 plt.show()
 #anim.save("particle_filter.gif", writer="imagemagick")
