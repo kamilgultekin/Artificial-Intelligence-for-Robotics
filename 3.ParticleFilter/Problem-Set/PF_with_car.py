@@ -1,4 +1,3 @@
-from __future__ import print_function, division
 from math import sqrt, pi, cos, sin, tan, exp, atan2
 import random
 import numpy as np
