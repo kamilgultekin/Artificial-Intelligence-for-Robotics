@@ -43,7 +43,7 @@ def next_move(hunter_position, hunter_heading, target_measurement, max_distance,
                 else:
                     num_steps += 1
                     future_heading = angle_trunc(future_heading + future_turning)
-            print(num_steps)
+            # print(num_steps)
             desired_heading = get_heading(hunter_position, future_pos)
         else:
             desired_heading = get_heading(hunter_position, next_pos)
@@ -153,12 +153,12 @@ def demo_grading_2(hunter_bot, target_bot, next_move_fcn, OTHER = None):
     chaser_robot.shape('arrow')
     chaser_robot.color('blue')
     chaser_robot.resizemode('user')
-    chaser_robot.shapesize(0.3, 0.3, 0.3)
+    chaser_robot.shapesize(0.5, 0.5, 0.5)
     broken_robot = turtle.Turtle()
     broken_robot.shape('turtle')
     broken_robot.color('green')
     broken_robot.resizemode('user')
-    broken_robot.shapesize(0.3, 0.3, 0.3)
+    broken_robot.shapesize(1, 1, 1)
     size_multiplier = 15.0 #change size of animation
     chaser_robot.hideturtle()
     chaser_robot.penup()
@@ -173,7 +173,7 @@ def demo_grading_2(hunter_bot, target_bot, next_move_fcn, OTHER = None):
     measuredbroken_robot.color('red')
     measuredbroken_robot.penup()
     measuredbroken_robot.resizemode('user')
-    measuredbroken_robot.shapesize(0.1, 0.1, 0.1)
+    measuredbroken_robot.shapesize(0.7, 0.7, 0.7)
     broken_robot.pendown()
     chaser_robot.pendown()
     #End of Visualization
