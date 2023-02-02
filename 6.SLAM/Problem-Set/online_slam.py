@@ -860,3 +860,60 @@ answer_omega2 = matrix([[0.22871751620895048, 0.0, -0.11351536555795691, 0.0, -0
 # result = online_slam(testdata2, 6, 2, 3.0, 4.0)
 # solution_check(result, answer_mu2, answer_omega2)
 
+def slam(data, N, num_landmarks, motion_noise, measurement_noise):
+    #
+    #
+    # Add your code here!
+    #
+    #
+    total = N + num_landmarks
+    mtc = motion_noise  # motion confidence
+    msc = measurement_noise  # measurement confidence
+    omegax = [[0.0 for row in range(total)] for col in range(total)]
+    xix = [[0.0 for row in range(1)] for col in range(total)]
+    omegay = [[0.0 for row in range(total)] for col in range(total)]
+    xiy = [[0.0 for row in range(1)] for col in range(total)]
+    omegax[0][0] += 1.
+    xix[0][0] += 50. 
+    omegay[0][0] += 1. 
+    xiy[0][0] += 50. 
+    for locI in range(len(data)):
+        for measI in range(len(data[locI][0])):
+            lmI = data[locI][0][measI][0] + N
+            msx = data[locI][0][measI][1] * msc
+            msy = data[locI][0][measI][2] * msc
+            omegax[locI][locI] += msc
+            omegax[lmI][lmI] += msc
+            omegax[locI][lmI] += -msc
+            omegax[lmI][locI] += -msc            
+            omegay[locI][locI] += msc
+            omegay[lmI][lmI] += msc
+            omegay[locI][lmI] += -msc
+            omegay[lmI][locI] += -msc
+            xix[locI][0] += -msx
+            xix[lmI][0] += msx            
+            xiy[locI][0] += -msy
+            xiy[lmI][0] += msy
+        dx = data[locI][1][0] * mtc
+        dy = data[locI][1][1] * mtc
+        omegax[locI][locI] += mtc
+        omegax[locI+1][locI+1] += mtc
+        omegax[locI+1][locI] += -mtc
+        omegax[locI][locI+1] += -mtc            
+        omegay[locI][locI] += mtc
+        omegay[locI+1][locI+1] += mtc
+        omegay[locI][locI+1] += -mtc
+        omegay[locI+1][locI] += -mtc
+        xix[locI][0] += -dx
+        xix[locI+1][0] += dx            
+        xiy[locI][0] += -dy
+        xiy[locI+1][0] += dy
+
+    mux = matrix(omegax).inverse() * matrix(xix)
+    muy = matrix(omegay).inverse() * matrix(xiy)
+    mu = []
+    for i in range(mux.dimx):
+        mu.append(mux.value[i])
+        mu.append(muy.value[i])
+    mu = matrix(mu)
+    return mu # Make sure you return mu for grading!
