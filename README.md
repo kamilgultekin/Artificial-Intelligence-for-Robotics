@@ -590,5 +590,314 @@ visualize_policy(grid, policy)
 ![dp](/docs/images/dynamic_prog.gif)
 
 ## PID Control
+
+In the context of robotics, control refers to the design, implementation, and operation of systems that manipulate physical variables to achieve desired performance or behavior. This involves the use of feedback, algorithms, and mathematical models to regulate the actions of the robot and ensure that it functions in a stable, predictable, and desired manner.
+
+The goal of control in robotics is to allow the robot to interact with its environment in a manner that accomplishes specific tasks or objectives. This may involve controlling the motion of the robot, the orientation of its sensors or manipulators, or other physical properties of the robot or its environment. The control system typically uses sensors and actuators to receive and respond to signals from the environment, and algorithms to process and interpret these signals to determine the appropriate control inputs.
+
+In general, control is a critical component of robotics, as it enables the robot to interact with and respond to its environment in a controlled and meaningful way. Without control, the robot would simply move or react in an uncontrolled manner, making it difficult to accomplish specific tasks or objectives.
+
+Some of the common control algorithms in robotics are:
+
+    - Proportional Integral Derivative (PID) Controller: It is a widely used control algorithm that adjusts the control signal based on the error, its integral and its derivative.
+
+    - Linear Quadratic Regulator (LQR): It is a control algorithm that optimizes a quadratic cost function that takes into account the state and control inputs of the system.
+
+    - Model Predictive Control (MPC): It is a control algorithm that uses a model of the system to predict future states and optimizes a cost function that takes into account both the current state and future states of the system.
+
+    - State Feedback Control: It is a control algorithm that uses the state of the system to generate a control signal.
+
+    - Adaptive Control: It is a control algorithm that adjusts its parameters based on the behavior of the system over time.
+
+    - Feedback Linearization: It is a control algorithm that linearizes a non-linear system by using feedback from the system.
+
+PID stands for Proportional, Integral and Derivative. It is a control algorithm used to regulate the behavior of a system. The goal of a PID controller is to ensure that a system behaves as expected by continuously comparing the desired output with the actual output and using the error to adjust the control inputs.
+
+There are three main components of a PID controller:
+
+    1. Proportional control: Proportional control adjusts the control input based on the magnitude of the error between the desired and actual outputs. The greater the error, the larger the control input.
+
+    2. Integral control: Integral control takes into account the accumulated error over time. It adjusts the control input based on the accumulated error, helping to eliminate systematic bias.
+
+    3. Derivative control: Derivative control adjusts the control input based on the rate of change of the error. It helps to stabilize the system and prevent overshoot.
+
+![pid](docs/images/pid.png)
+*Credit: https://www.motioncontroltips.com*
+
+PID controllers are widely used in various systems, including control of temperature, speed, and position in robotics, aviation and industrial processes.
+
+One of the advantages of PID controllers is that they are able to effectively handle systems with significant non-linearities, making them ideal for use in a wide range of applications. Additionally, they are simple to implement and require only basic knowledge of control theory.
+
+There are many different variations of PID controllers, including PI controllers, PD controllers, and PID controllers with various filter designs. The most common type of PID controller is the standard PID controller, which uses all three components of proportional, integral and derivative control.
+
+The main disadvantage of PID controllers is that they can become unstable if the gain parameters are not properly set, leading to oscillations and other undesirable behavior. Additionally, they may not always be able to achieve optimal performance, particularly in systems with significant time delays or complex dynamics.
+
+#### Main PID Control Code:
+
+##### Initialization of the Robot
+
+```python
+robot = Robot()
+robot.set(0, 1, 0)
+robot.set_steering_drift(10.0/180.0*3.14) # add steering wheel 
+```
+
+#### PID Function
+
+```python
+def run(robot, tau_p, tau_d, tau_i, n=200, speed=1.0):
+    x_trajectory = []
+    y_trajectory = []
+    # TODO: your code here
+    prev_cte = robot.y
+    int_cte = 0
+    for i in range(n):
+        cte = robot.y
+        diff_cte = (cte - prev_cte) / speed
+        prev_cte = cte
+        int_cte += cte
+        steer = -tau_p * cte - tau_d * diff_cte - tau_i * int_cte
+        robot.move(steer, speed)
+        x_trajectory.append(robot.x)
+        y_trajectory.append(robot.y)
+    return x_trajectory, y_trajectory
+```
+
+#### Visualization
+
+```python
+x_trajectory, y_trajectory = run(robot,  0.2, 3.0,0.004)
+n = len(x_trajectory)
+
+fig, ax = plt.subplots(1, 1, figsize=(16, 8))
+ax.plot(x_trajectory, y_trajectory, 'g', label='PID controller')
+ax.plot(x_trajectory, np.zeros(n), 'r', label='reference')
+ax.legend()
+plt.show()
+```
+
+#### Output
+
+![p](/docs/images/p_controller.png)
+*P controller*
+![pd](/docs/images/pd_controller.png)
+*PD controller*
+![pid](/docs/images/pid_controller.png)
+*PID controller*
+
+### Systematic Bias
+What happens to the robot when it has improperly aligned wheels? It causes large cross-track error. So Integral controller if solving the problem as you see below.
+
+![pid](/docs/images/pd_with_noise_controller.png)
+*PD controller with Noise*
+![pid](/docs/images/pid_with_noise_controller.png)
+*PID controller with Noise*
+
+### Parameter Optimization
+One important question remains in order for us to effectively implement the PID controller: how can we determine the optimal parameters (also known as control gains) to use? What we will use is an algorithm called “Twiddle” that adjusts parameters one at a time to find an optimal set.
+
+The Twiddle algorithm is a well-known optimization technique for finding the optimal parameters for a control system. This algorithm is particularly useful in robotics, where the parameters of the control system need to be fine-tuned to achieve the desired performance. In this section, we will provide a detailed mathematical explanation of the Twiddle algorithm and its use in optimizing the parameters of a robot control system.
+
+The Twiddle algorithm works by iteratively adjusting the parameters of the control system until an optimal set of parameters is found. The algorithm starts with an initial set of parameters, which are then adjusted by small amounts in each iteration. The parameters are adjusted in such a way that the performance of the control system is improved in each iteration. The iteration continues until the improvement in performance is less than a specified tolerance, at which point the algorithm stops.
+
+```python
+def twiddle(tol=0.2): 
+    # TODO: Add code here
+    # Don't forget to call `make_robot` before you call `run`!
+    p = [0.0, 0.0, 0.0]
+    dp = [1.0, 1.0, 1.0]
+    robot = make_robot()
+    x_trajectory, y_trajectory, best_err = run(robot, p)
+
+    it = 0
+    while sum(dp) > tol:
+        print("Iteration {}, best error = {}".format(it, best_err), end='\r')
+        time.sleep(.1)
+        for i in range(len(p)):
+            p[i] += dp[i]
+            robot = make_robot()
+            x_trajectory, y_trajectory, err = run(robot, p)
+
+            if err < best_err:
+                best_err = err
+                dp[i] *= 1.1
+            else:
+                p[i] -= 2 * dp[i]
+                robot = make_robot()
+                x_trajectory, y_trajectory, err = run(robot, p)
+
+                if err < best_err:
+                    best_err = err
+                    dp[i] *= 1.1
+                else:
+                    p[i] += dp[i]
+                    dp[i] *= 0.9
+        it += 1
+    return p, best_err
+```
+
+```python
+params, err = twiddle()
+print("Final twiddle error = {}".format(err))
+robot = make_robot()
+x_trajectory, y_trajectory, err = run(robot, params)
+n = len(x_trajectory)
+
+fig, ax1 = plt.subplots(1, 1, figsize=(16, 8))
+ax1.plot(x_trajectory, y_trajectory, 'g', label='Twiddle PID controller')
+ax1.plot(x_trajectory, np.zeros(n), 'r', label='reference')
+ax1.legend()
+plt.show()
+```
+![twiddle](docs/images/twiddle.png)
+*Result after Twiddle Algorithm*
 ### Smoothing
+You don’t want the robot to go straight, take a 90-degree turn, then go straight again. A car cannot even make a 90-degree turn, and this route will force the robot to move really slowly around the corners.
+![smooth](docs/images/path_smooth.png)
+*Credit: Path Smoothing Techniques in Robot Navigation: State-of-the-Art, Current and Future Challenges*
+
+Path smoothing is a common technique used in robotics and control systems to improve the quality and safety of a robot's path. The goal of path smoothing is to take a rough or jerky path and smooth it out, making it smoother and more predictable. There are several algorithms used to achieve this goal, including:
+
+    - Bezier Curves:
+    Bezier curves are a type of curve that are often used for path smoothing in robotics. They are defined by a set of control points, which can be adjusted to create different shapes. In robotics, the control points are typically the waypoints along the path, and the curve is used to create a smooth transition between them.
+
+    - Splines:
+    Splines are a type of curve that can be used for path smoothing in robotics. They are similar to Bezier curves in that they are defined by control points, but they are more flexible and can handle more complex shapes. In robotics, splines are often used to create smooth, natural-looking paths, especially in applications where the robot is moving through 3D space.
+
+    - Gaussian Process Regression:
+    Gaussian Process Regression (GPR) is a type of machine learning algorithm that can be used for path smoothing. It uses a probabilistic model to predict the shape of the path based on data from previous movements. This makes it well-suited for use in robotics, where the path can change over time as the environment changes or the robot encounters unexpected obstacles.
+
+In general, path smoothing is an important technique for improving the performance and safety of robots. By creating smoother, more predictable paths, robots can move more efficiently and avoid collisions or other problems that might arise from jerky or unpredictable movements
+
+```python
+path = [[0, 0],
+        [0, 1],
+        [0, 2],
+        [1, 2],
+        [2, 2],
+        [3, 2],
+        [4, 2],
+        [4, 3],
+        [4, 4]]
+
+def smooth(path, weight_data = 0.1, weight_smooth = 0.1, tolerance = 0.000001):
+    global newpath
+    # Make a deep copy of path into newpath
+    newpath = deepcopy(path)
+
+    #######################
+    ### ENTER CODE HERE ###
+    #######################
+    change = tolerance
+    while change >= tolerance:
+        change = 0.0
+        for i in range(1, len(path)-1):
+            for j in range(len(path[0])):
+                aux = newpath[i][j]
+                newpath[i][j] += weight_data * (path[i][j] - newpath[i][j]) + weight_smooth * (newpath[i-1][j] + newpath[i+1][j] - 2.0 * newpath[i][j])
+                change += abs(aux - newpath[i][j])
+    return newpath # Leave this line for the grader!
+
+printpaths(path,smooth(path))
+>>> [0.000, 0.000] -> [0.000, 0.000]
+[0.000, 1.000] -> [0.143, 0.857]
+[0.000, 2.000] -> [0.429, 1.571]
+[1.000, 2.000] -> [1.143, 1.857]
+[2.000, 2.000] -> [2.000, 2.000]
+[3.000, 2.000] -> [2.857, 2.143]
+[4.000, 2.000] -> [3.571, 2.429]
+[4.000, 3.000] -> [3.857, 3.143]
+[4.000, 4.000] -> [4.000, 4.000]
+```
+
+![plot_smooth](docs/images/smooth_plot.png)
+
+#### Animation
+##### PID Controller
+![pid](/docs/images/pid_anim.gif)
+##### Path Smoothing
+![path](/docs/images/path_smooth_anim.gif)
+![path](/docs/images/path_smooth_anim_2.gif)
 ## SLAM
+Simultaneous Localization and Mapping (SLAM) is a fundamental problem in robotics that involves creating a map of an unknown environment while simultaneously estimating the robot's position within that environment. This is achieved by integrating information from various sensors such as lidar, cameras, or ultrasonic sensors to construct a map and determine the robot's position relative to the map.
+
+The key objective of SLAM is to build an accurate, real-time map of the environment while tracking the robot's position. This requires the fusion of multiple sensory inputs to estimate the robot's position, orientation, and environment while also constructing a map that can be updated in real-time.
+
+There are two main approaches to SLAM, including feature-based and filter-based methods. Feature-based methods rely on identifying salient features in the environment, such as corners or edges, to construct the map and determine the robot's position. Filter-based methods, on the other hand, use a probabilistic framework to estimate the robot's position and build the map.
+
+One of the most widely used SLAM algorithms is the extended Kalman filter (EKF) SLAM. This approach uses an EKF to estimate the robot's pose and map the environment in real-time. The EKF takes into account the robot's motion model, sensor measurements, and uncertainty to estimate the robot's position and update the map.
+
+Another popular SLAM algorithm is the Monte Carlo Localization (MCL) approach, which uses a particle filter to estimate the robot's position. This algorithm generates multiple particles, each representing a potential estimate of the robot's position, and updates the particles based on sensor measurements. The algorithm can also incorporate motion models to estimate the robot's motion and update the particles accordingly.
+
+In conclusion, SLAM is an important aspect of robotics that enables robots to navigate and build maps of their environment. Both feature-based and filter-based methods have been developed to tackle this problem, with EKF SLAM and MCL being two of the most widely used algorithms. These approaches allow robots to accurately determine their position and build maps in real-time, making them essential for autonomous navigation and exploration.
+
+### Graph SLAM:
+ It uses a graph-based approach to simultaneously estimate the position of the robot and the map of the environment. The graph is constructed by connecting nodes that represent the robot’s pose and the landmarks in the environment.
+
+The algorithm works by iteratively updating the nodes in the graph based on measurements and observations obtained by the robot. It starts with an initial estimate of the robot’s pose and the landmarks in the environment. As the robot moves around, it collects data in the form of range and bearing measurements to other landmarks. This data is then used to update the nodes in the graph and estimate the position of the robot and the landmarks.
+
+The algorithm can handle uncertainty in the data and allows for real-time estimation of the robot’s position. The graph-based approach is more flexible compared to other SLAM algorithms and can handle a wide range of measurements, such as range and bearing, lidar, or even visual data.
+
+Graph SLAM is widely used in a variety of robotic applications, including autonomous navigation, mapping and localization, and exploration. It is an important tool for robots to understand their environment and navigate in it accurately.
+
+#### Algorithms
+```python
+def slam(i, dx, dy, Z):
+    global omega, xi
+    omega = np.insert(omega, i + 1, 0, axis=0)
+    omega = np.insert(omega, i + 1, 0, axis=1)
+    xi = np.insert(xi, i + 1, 0, axis=0)
+    for meas in Z:
+        j, x, y = meas
+        omega[i, i] = omega[i, i] + 1/MEASUREMENT_NOISE
+        omega[i, i + j + 2] = omega[i, i + j + 2] - 1/MEASUREMENT_NOISE
+        omega[i + j + 2, i] = omega[i + j + 2, i] - 1/MEASUREMENT_NOISE
+        omega[i + j + 2, i + j + 2] = omega[i + j + 2, i + j + 2] + 1/MEASUREMENT_NOISE
+        xi[i, :] = xi[i, :] - np.array([x, y])/MEASUREMENT_NOISE
+        xi[i + j + 2, :] = xi[i + j + 2, :] + np.array([x, y])/MEASUREMENT_NOISE
+    omega[i, i] = omega[i, i] + 1/MOTION_NOISE
+    omega[i + 1, i + 1] = omega[i + 1, i + 1] + 1/MOTION_NOISE
+    omega[i + 1, i] = omega[i + 1, i] - 1/MOTION_NOISE
+    omega[i, i + 1] = omega[i, i + 1] - 1/MOTION_NOISE
+    xi[i, :] = xi[i, :] - np.array([dx, dy])/MOTION_NOISE
+    xi[i + 1, :] = xi[i + 1, :] + np.array([dx, dy])/MOTION_NOISE
+    mu_x = np.linalg.inv(omega[:, :, 0]).dot(xi[:, 0])
+    mu_y = np.linalg.inv(omega[:, :, 1]).dot(xi[:, 1])
+    return np.c_[mu_x, mu_y]
+```
+
+The goal of the algorithm is to estimate the position of a robot and the positions of landmarks in a given environment based on the robot's motion and measurement data.
+
+The initial parameters are defined such as the motion noise, measurement noise, number of landmarks, and the positions of landmarks. The omega and xi arrays are created to store the information about the system state and the relationship between the robot's position and the landmark positions. The omega array represents the information matrix and the xi array represents the information vector.
+
+The slam function performs the graph-based SLAM algorithm. It takes in the current time step, i, the robot's motion in the x-direction, dx, and the y-direction, dy, and a list of measurements, Z. The function first adds the new position of the robot and the associated landmarks to the omega and xi arrays. For each measurement, the information matrix omega and information vector xi are updated to reflect the relationship between the robot's position and the landmark position. The motion noise and measurement noise are taken into account when updating omega and xi.
+
+Finally, the estimated positions of the robot and landmarks are computed using the inverse of omega and xi and returned as the result of the slam function.
+
+#### Animation
+##### Graph Slam
+![pid](/docs/images/slam_anim.gif)
+
+# Practice Exam
+
+Please click [here](/Practice%20Exam/README.md) to see my solutions to Practive Exam for UDACITY Artificial Intelligence for Robotics Course. 
+
+# Project Runaway Robot
+
+## Background
+
+A robotics company named Trax has created a line of small self-driving robots designed to autonomously traverse desert environments in search of undiscovered water deposits.  A Traxbot looks like a small tank. Each one is about half a meter long and drives on two continuous metal tracks. In order to maneuver itself, a Traxbot can do one of two things: it can drive in a straight line or it can turn. So to make a  right turn, A Traxbot will drive forward, stop, turn 90 degrees, then continue driving straight. This series of questions involves the recovery of a rogue Traxbot. This bot has  gotten lost somewhere in the desert and is now stuck driving in an almost-circle: it has been repeatedly driving forward by some step size, stopping, turning a certain  amount, and repeating this process... Luckily, the Traxbot is still sending all of its sensor data back to headquarters. 
+
+In this project, we will start with a simple version of this problem and gradually add complexity. By the end, you will have a fully articulated plan for recovering the lost Traxbot. we'll track down and recover the runaway Traxbot.
+
+Let's start by thinking about circular motion (well, really it's polygon motion that is close to circular motion). Assume that Traxbot lives on an (x, y) coordinate plane and (for now) is sending you PERFECTLY ACCURATE sensor measurements.  With a few measurements you should be able to figure out the step size and the  turning angle that Traxbot is moving with. With these two pieces of information, you should be able to  write a function that can predict Traxbot's next location.  
+
+![1](/docs/videos/1.mp4)
+
+Now we'll make the scenario a bit more realistic. Now Traxbot's sensor measurements are a bit noisy (though its motions are still completetly noise-free and it still moves in an almost-circle). You'll have to write a function that takes as input the next noisy (x, y) sensor measurement and outputs the best guess  for the robot's next position.  
+![2](/docs/videos/2.mp4)
+Now you'll actually track down and recover the runaway Traxbot.  In this step, your speed will be about twice as fast the runaway bot, which means that your bot's distance parameter will be about twice that of the runaway. You can move less than this parameter if you'd  like to slow down your bot near the end of the chase.   
+![3](/docs/videos/3.mp4)
+Again, you'll track down and recover the runaway Traxbot.  But this time, your speed will be about the same as the runaway bot.  This may require more careful planning than you used last time.
+![4](/docs/videos/3.mp4)
+
