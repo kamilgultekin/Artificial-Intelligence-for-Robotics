@@ -166,10 +166,429 @@ The code also includes a test case, which sets the initial state, the initial un
 ![kal-two-d](/docs/images/kalman-localization_2D.gif "anim kal two")
 
 ### Particle Filters
+A particle filter is a type of algorithm used for robot localization, which is the process of determining the location and orientation of a robot within a known environment. The particle filter algorithm uses a set of random "particles" that represent possible locations and orientations of the robot.
+
+The algorithm begins by randomly generating a set of particles, each with a different location and orientation. The particles are then moved based on the robot's motion and sensor readings. For example, if the robot moves forward, the particles will also move forward, and if the robot senses an obstacle, the particles will be adjusted to avoid that obstacle.
+
+The algorithm then uses a process called resampling to select the particles that are most likely to represent the true location and orientation of the robot. This is done by comparing the sensor readings from the robot to the sensor readings predicted by the particles. The particles with the highest likelihood of representing the true location and orientation are selected, and the others are discarded.
+
+The process of motion, sensor update, and resampling is repeated many times until the location and orientation of the robot is determined with a high degree of accuracy.
+
+One of the benefits of a particle filter is that it can handle uncertainty and noise in the sensor readings and motion of the robot. It is also computationally efficient and can be used in real-time applications.
+
+The Particle Filter is capable of providing multimodal prediction of the robot's position, meaning that it can estimate the location of the robot in multiple areas. This makes the Particle Filter suitable for environments where the robot's position is uncertain or when there are multiple possible locations.
+
+Resampling is the process of selecting which particles are most likely to represent the true location and orientation of the robot. It's kind of like picking the best guesses out of all the guesses the robot made at the beginning.
+
+![particle](docs/images/sampling.png)
+*Credit: https://www.lancaster.ac.uk/stor-i-student-sites/martin-dimitrov*
+
+When the robot uses its sensors to look around and gather information, it can use that information to figure out how likely each of its guesses is to be correct. So, it can assign a probability to each particle, based on how well it matches up with the sensor data.
+
+Once it has these probabilities, it can use them to decide which particles to keep and which to get rid of. The particles with the highest probabilities are the ones that are most likely to be right, so the robot will keep those. The particles with the lowest probabilities are the ones that are least likely to be right, so the robot will get rid of those.
+
+By doing this, the robot is able to narrow down its guesses and get closer to figuring out where it is.
+
+#### Main Particle Filter Code:
+
+##### Initialize the World
+
+```python
+myrobot = robot()
+myrobot = myrobot.move(0.1, 5.0)
+Z = myrobot.sense()
+N = 1000
+T = 10 
+```
+
+##### Algorithm
+
+```python
+myrobot = robot()
+myrobot = myrobot.move(0.1, 5.0)
+Z = myrobot.sense()
+N = 1000
+T = 10 #Leave this as 10 for grading purposes.
+
+p = []
+for i in range(N):
+    r = robot()
+    r.set_noise(0.05, 0.05, 5.0)
+    p.append(r)
+
+for t in range(T):
+    myrobot = myrobot.move(0.1, 5.0)
+    Z = myrobot.sense()
+
+    p2 = []
+    for i in range(N):
+        p2.append(p[i].move(0.1, 5.0))
+    p = p2
+
+    w = []
+    for i in range(N):
+        w.append(p[i].measurement_prob(Z))
+
+    p3 = []
+    index = int(random.random() * N)
+    beta = 0.0
+    mw = max(w)
+    for i in range(N):
+        beta += random.random() * 2.0 * mw
+        while beta > w[index]:
+            beta -= w[index]
+            index = (index + 1) % N
+        p3.append(p[index])
+    p = p3
+    print(eval(myrobot,p))
+```
+
+The code above is an implementation of a Particle Filter for robot localization. The code defines a robot class with the attributes x, y, orientation, forward_noise, turn_noise, and sense_noise representing the current position and orientation of the robot and the measurement noise for movement and sensing.
+
+In the code, a robot is created with myrobot = robot(). The robot then moves 0.1 units in the x direction and turns 5.0 units to the right with myrobot = myrobot.move(0.1, 5.0). The robot senses its position with Z = myrobot.sense().
+
+A set of N particles p is then created, each with an instance of the robot class and with added measurement noise with r.set_noise(0.05, 0.05, 5.0).
+
+For T time steps, the myrobot moves 0.1 units in the x direction and turns 5.0 units to the right. The set of particles p also moves 0.1 units in the x direction and turns 5.0 units to the right.
+
+For each particle, the weight w is calculated based on the particle's measurement probability measurement_prob given the measurement Z from the myrobot. The particle set p is then resampled based on the weights w, with the most probable particles being selected more often.
+
+Finally, the code outputs the expected position and orientation of the robot given the resampled particle set p using the eval function.
+
+#### Animation
+##### Two Dimensional Example
+![partice-two-d1](/docs/images/particle-localization_2D_1.gif)
+![partice-two-d2](/docs/images/particle-localization_2D_2.gif)
+##### Example with Car Model
+![particle-car1](/docs/images/particle-localization_car_1.gif)
+![particle-car2](/docs/images/particle-localization_car_2.gif)
+
 ## Motion Planning/Search Algorithms
+Motion planning and search algorithms are techniques used to find the optimal path for a robot to follow from its starting point to its destination. There are several algorithms that can be used for motion planning and search, including Breadth First Search (BFS), A Star, and dynamic programming. These algorithms differ in terms of their approach, efficiency, and the types of problems they can solve.
+
+Motion planning and search algorithms play a crucial role in robotics by helping robots find the optimal path from their starting point to their destination. The choice of algorithm depends on the specific problem being solved and the desired trade-off between efficiency and optimality.
+
+![motion-planning](/docs/images/motion_planning.png)
+*Features of Search Algorithms*
+
 ### Breadth First Search Algorithm
+Breadth First Search (BFS) is a search algorithm that is used to find the shortest path from a source node to a goal node. This algorithm works by exploring all possible paths from the source node to the goal node and choosing the path that has the minimum number of edges. BFS is a complete and optimal algorithm, meaning that it will find the shortest path if one exists.
+
+The BFS algorithm starts at the source node and expands the search by exploring all its neighboring nodes first. Once all the neighboring nodes have been explored, the algorithm moves to the next layer of nodes, and so on, until the goal node is found. BFS is guaranteed to find the shortest path in unweighted graphs, but it is not as efficient as other algorithms in large and complex graphs.
+
+#### Main BFS Code:
+
+##### Sample Test Case
+
+```python
+grid = [[0, 0, 1, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 1, 0, 1, 0],
+        [0, 0, 1, 0, 1, 0],
+        [0, 0, 1, 0, 1, 0]]
+init = [0, 0]
+goal = [len(grid)-1, len(grid[0])-1]
+cost = 1
+
+delta = [[-1, 0 ], # go up
+         [ 0, -1], # go left
+         [ 1, 0 ], # go down
+         [ 0, 1 ]] # go right
+
+delta_name = ['^', '<', 'v', '>']
+```
+
+##### Search Function
+
+```python
+def search():
+    closed = [[0 for row in range(len(grid[0]))] for col in range(len(grid))]
+    closed[init[0]][init[1]] = 1
+
+    movement = [[-1 for row in range(len(grid[0]))] for col in range(len(grid))]
+    path = [[' ' for row in range(len(grid[0]))] for col in range(len(grid))]
+
+    x = init[0]
+    y = init[1]
+    g = 0
+
+    open = [[g, x, y]]
+
+    found = False  # flag that is set when search is complet
+    resign = False # flag set if we can't find expand
+
+    while not found and not resign:
+        if len(open) == 0:
+            resign = True
+            return 'fail'
+        else:
+            open.sort()
+            open.reverse()
+            next = open.pop()
+            x = next[1]
+            y = next[2]
+            g = next[0]
+
+            if x == goal[0] and y == goal[1]:
+                found = True
+            else:
+                for i in range(len(delta)):
+                    x2 = x + delta[i][0]
+                    y2 = y + delta[i][1]
+                    if x2 >= 0 and x2 < len(grid) and y2 >=0 and y2 < len(grid[0]):
+                        if closed[x2][y2] == 0 and grid[x2][y2] == 0:
+                            g2 = g + cost
+                            open.append([g2, x2, y2])
+                            closed[x2][y2] = 1
+                            movement[x2][y2] = i
+    x, y = goal
+    path[x][y] = '*'
+    while x != init[0] or y != init[1]:
+        i = movement[x][y]
+        dx, dy = delta[i]
+        x, y = x-dx, y-dy
+        path[x][y] = delta_name[i]
+    for i in range(len(movement)):
+        print(movement[i])
+    for i in range(len(path)):
+        print(path[i])
+    return path # make sure you return the shortest path.
+```
+
+```python
+
+delta_name.append('*')
+path = search()
+path_list = []
+for i in range(len(path)):
+    for j in range(len(path[0])):
+        if path[i][j] in delta_name:
+            path_list.append([i,j])
+print(path_list)
+for i in range(len(path)):
+    print(path[i])
+
+visualize(grid, path_list)
+```
+
+##### Output
+
+![BFS](/docs/images/BFS_Out.png)
+
 ### A* Search Algorithm
+A Star is an algorithm used for finding the shortest path between two nodes in a weighted graph. Unlike BFS, which does not take into account the distances between nodes, A Star takes into account the distances between nodes and assigns a cost to each edge. The algorithm uses a heuristic function to estimate the cost of reaching the goal node from a given node. This allows A Star to prioritize the search and focus on the most promising paths.
+
+A Star is an optimal algorithm, meaning that it will find the shortest path if one exists. The algorithm starts at the source node and adds it to a priority queue, with the priority determined by the estimated cost to reach the goal node. The algorithm then selects the node with the lowest cost and expands the search to its neighbors. The process continues until the goal node is found or there are no more nodes to explore.
+
+#### Main A* Code:
+
+##### Sample Test Case
+
+```python
+grid = [[0, 1, 0, 0, 0, 1],
+        [0, 1, 0, 1, 0, 1],
+        [0, 1, 0, 0, 0, 0],
+        [0, 1, 0, 1, 1, 0],
+        [0, 0, 0, 0, 1, 0]]
+
+heuristic = [[9, 8, 7, 6, 5, 4],
+             [8, 7, 6, 5, 4, 3],
+             [7, 6, 5, 4, 3, 2],
+             [6, 5, 4, 3, 2, 1],
+             [5, 4, 3, 2, 1, 0]]
+
+init = [0, 0]
+goal = [len(grid)-1, len(grid[0])-1]
+cost = 1
+
+delta = [[-1, 0 ], # go up
+         [ 0, -1], # go left
+         [ 1, 0 ], # go down
+         [ 0, 1 ]] # go right
+
+delta_name = ['^', '<', 'v', '>']
+```
+
+##### Search Function
+
+```python
+def search(grid,init,goal,cost,heuristic):
+    closed = [[0 for col in range(len(grid[0]))] for row in range(len(grid))]
+    closed[init[0]][init[1]] = 1
+
+    movement = [[-1 for row in range(len(grid[0]))] for col in range(len(grid))]
+    path = [[' ' for row in range(len(grid[0]))] for col in range(len(grid))]
+
+    x = init[0]
+    y = init[1]
+    g = 0
+    f = g + heuristic[x][y]
+
+    open = [[f, g, x, y]]
+
+    found = False  # flag that is set when search is complete
+    resign = False # flag set if we can't find expand
+    count = 0
+    
+    while not found and not resign:
+        if len(open) == 0:
+            resign = True
+            return "Fail"
+        else:
+            open.sort()
+            open.reverse()
+            next = open.pop()
+            x = next[2]
+            y = next[3]
+            g = next[1]
+            f = next[0]
+            count += 1
+            
+            if x == goal[0] and y == goal[1]:
+                found = True
+            else:
+                for i in range(len(delta)):
+                    x2 = x + delta[i][0]
+                    y2 = y + delta[i][1]
+                    if x2 >= 0 and x2 < len(grid) and y2 >=0 and y2 < len(grid[0]):
+                        if closed[x2][y2] == 0 and grid[x2][y2] == 0:
+                            g2 = g + cost
+                            f2 = g2 + heuristic[x2][y2]
+                            open.append([f2, g2, x2, y2])
+                            closed[x2][y2] = 1
+                            movement[x2][y2] = i
+    x, y = goal
+    path[x][y] = '*'
+    while x != init[0] or y != init[1]:
+        i = movement[x][y]
+        dx, dy = delta[i]
+        x, y = x-dx, y-dy
+        path[x][y] = delta_name[i]
+    for i in range(len(movement)):
+        pass
+        # print(movement[i])
+    for i in range(len(path)):
+        pass
+        # print(path[i])
+    return path # make sure you return the shortest path.
+```
+
+```python
+delta_name.append('*')
+path = search(grid, init,goal,cost, heuristic)
+path_list = []
+for i in range(len(path)):
+    for j in range(len(path[0])):
+        if path[i][j] in delta_name:
+            path_list.append([i,j])
+print(path_list)
+for i in range(len(path)):
+    print(path[i])
+
+visualize(grid, path_list)
+```
+
+##### Output
+
+![astar](/docs/images/A_star_out.png)
+
 ### Dynamic Programming
+Dynamic programming is a technique used to solve optimization problems by breaking them down into smaller subproblems. The idea is to solve each subproblem only once and store the results, so that they can be reused later. This approach allows for significant savings in computation time and is particularly useful for solving problems with overlapping subproblems.
+
+Dynamic programming can be used for motion planning and search problems by breaking down the problem into smaller subproblems and solving them iteratively. The algorithm starts by defining the initial state and the goal state, and then solves each subproblem in a bottom-up fashion, until the final solution is found. Dynamic programming is particularly useful for problems with large state spaces, as it allows for a more efficient and optimized solution.
+
+#### Main Dynamic Programming Code:
+
+##### Sample Test Case
+
+```python
+grid = [[0, 1, 0, 0, 0, 0],
+        [0, 1, 0, 0, 0, 0],
+        [0, 1, 0, 0, 0, 0],
+        [0, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 1, 0]]
+init = [0, 0]
+goal = [len(grid)-1, len(grid[0])-1]
+cost = 1 # the cost associated with moving from a cell to an adjacent one
+
+delta = [[-1, 0 ], # go up
+         [ 0, -1], # go left
+         [ 1, 0 ], # go down
+         [ 0, 1 ]] # go right
+
+delta_name = ['^', '<', 'v', '>']
+```
+
+##### Search Function
+
+```python
+def optimum_policy(grid,goal,cost):
+    # ----------------------------------------
+    # modify code below
+    # ----------------------------------------
+    value = [[99 for row in range(len(grid[0]))] for col in range(len(grid))]
+    change = True
+
+    while change:
+        change = False
+
+        for x in range(len(grid)):
+            for y in range(len(grid[0])):
+                if goal[0] == x and goal[1] == y:
+                    if value[x][y] > 0:
+                        value[x][y] = 0
+
+                        change = True
+
+                elif grid[x][y] == 0:
+                    for a in range(len(delta)):
+                        x2 = x + delta[a][0]
+                        y2 = y + delta[a][1]
+
+                        if x2 >= 0 and x2 < len(grid) and y2 >= 0 and y2 < len(grid[0]) and grid[x2][y2] == 0:
+                            v2 = value[x2][y2] + cost
+
+                            if v2 < value[x][y]:
+                                change = True
+                                value[x][y] = v2
+    
+    policy = [[' ' for x in range(len(grid[0]))] for y in range(len(grid))]
+    for x in range(len(grid[0])):
+        for y in range(len(grid)):
+            if value[y][x] == 99:
+                continue
+            if value[y][x] == 0:
+                policy[y][x] = '*'
+                continue
+            surroundingCells = [99,99,99,99]
+            for i in range(len(delta)):
+                x2 = x + delta[i][1]
+                y2 = y + delta[i][0]
+                if x2 >= 0 and x2 < len(grid[0]) and y2 >= 0 and y2 < len(grid):
+                    surroundingCells[i] = value[y2][x2]
+            minVal = min(surroundingCells)
+            for j in range(len(surroundingCells)):
+                if surroundingCells[j] == minVal and minVal != 99:
+                    policy[y][x] = delta_name[j]
+
+    return policy
+```
+
+```python
+policy = optimum_policy(grid, goal, cost)
+visualize_policy(grid, policy)
+```
+
+##### Output
+
+![dp](/docs/images/dynamic_prog_out.png)
+
+#### Animation
+##### A star
+![as_tar](/docs/images/astar.gif)
+##### Dynamic Programming
+![dp](/docs/images/dynamic_prog.gif)
+
 ## PID Control
 ### Smoothing
 ## SLAM
