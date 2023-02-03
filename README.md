@@ -91,11 +91,85 @@ The for loop in the code iterates through the measurements and movements and upd
 ![hist-two-d](/docs/images/hist-localization_2D.gif "anim hist two")
 
 ### Kalman Filters
+Kalman Filter is an algorithm that is widely used in the field of robotics for estimation of the state of a system, especially in the context of localization and tracking. The main aim of the Kalman Filter is to estimate the state of the system and to minimize the estimation error. The algorithm operates in a two-step process. In the first step, the algorithm predicts the next state of the system based on the previous state and the control inputs. In the second step, the algorithm updates the predicted state by taking into account the measurement information.
+
+Kalman Filter is particularly useful in the presence of noisy measurements or uncertain dynamic models. It provides an optimal estimate by taking into account the estimated measurement noise and system model noise. The algorithm also has the ability to handle multi-dimensional systems, making it a suitable choice for mobile robots.
+
+To implement Kalman Filter for a mobile robot, we need to have a mathematical model of the robot and its environment. The robot model should include the robot's kinematic equations, the measurement model, and the process noise. Then, we can use the Kalman Filter algorithm to estimate the state of the robot based on the measurements and control inputs. The algorithm can be implemented using linear algebra and matrix operations, making it computationally efficient for real-time applications.
+
+The Kalman Filter provides a unimodal prediction of the robot's position. It uses a single Gaussian distribution to represent the state of the system, rather than multiple distributions. The algorithm uses the measurement and process models to update the mean and covariance of this Gaussian distribution, providing a single prediction for the state of the system.
+
+In conclusion, the Kalman Filter is a powerful algorithm that provides optimal estimation of the state of a system. Its ability to handle multi-dimensional systems, noisy measurements, and uncertain models make it a popular choice for robotic applications, particularly for localization and tracking.
+
+#### Main Kalman Filter Code:
+
+##### Kalman Filter Function
+
+```python
+def kalman_filter(x, P):
+    
+    for n in range(len(measurements)):
+        global u, F, H, R, I
+        
+        # measurement update
+        Z = matrix([[measurements[n]]])
+        y = Z - (H*x)
+        S = H* P * H.transpose() + R
+        K = P * H.transpose() * S.inverse()
+        x = x + (K * y)
+        P = (I - (K * H)) * P
+        
+        # prediction
+        x = (F * x) + u
+        P = F* P *F.transpose()
+    return x,P
+
+```
+
+##### Test
+
+```python
+measurements = [1, 2, 3]
+
+x = matrix([[0.], [0.]]) # initial state (location and velocity)
+P = matrix([[1000., 0.], [0., 1000.]]) # initial uncertainty
+u = matrix([[0.], [0.]]) # external motion
+F = matrix([[1., 1.], [0, 1.]]) # next state function
+H = matrix([[1., 0.]]) # measurement function
+R = matrix([[1.]]) # measurement uncertainty
+I = matrix([[1., 0.], [0., 1.]]) # identity matrix
+
+result = kalman_filter(x, P)
+print('x: ', result[0])
+print('P: ', result[1])
+# output should be:
+# x: [[3.9996664447958645], [0.9999998335552873]]
+# P: [[2.3318904241194827, 0.9991676099921091], [0.9991676099921067, 0.49950058263974184]]
+```
+
+The main function kalman_filter takes two inputs: x and P. x represents the initial state of the robot, which includes its location and velocity, and P represents the initial uncertainty about the state of the robot.
+
+The function first initializes several variables, including the state transition function F, the measurement function H, the measurement uncertainty R, and the identity matrix I. Then, for each measurement, the function performs a measurement update and a prediction.
+
+In the measurement update step, the function uses the measurement and the measurement function H to calculate the difference between the measurement and the current estimate of the robot's state. This difference is used to calculate the Kalman gain K, which is used to update the state estimate and its uncertainty.
+
+In the prediction step, the function uses the state transition function F to predict the next state of the robot based on its current state and the external motion u. The uncertainty of the predicted state is also updated.
+
+The result of the kalman_filter function is a tuple containing the final estimate of the robot's state and its uncertainty.
+
+The code also includes a test case, which sets the initial state, the initial uncertainty, and the measurement data, and calls the kalman_filter function. The output should be the final estimate of the robot's state and its uncertainty.
+
+#### Animation
+##### One Dimensional Example
+![kal-one-d](/docs/images/kalman-localization_1D.gif "anim kal one")
+##### Two Dimensional Example
+![kal-two-d](/docs/images/kalman-localization_2D.gif "anim kal two")
+
 ### Particle Filters
 ## Motion Planning/Search Algorithms
 ### Breadth First Search Algorithm
 ### A* Search Algorithm
 ### Dynamic Programming
 ## PID Control
-### Smoothing
+### Smoothing
 ## SLAM
