@@ -1,4 +1,3 @@
-from __future__ import print_function, division
 import random
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
@@ -76,9 +75,9 @@ def init():
     prob_ax.set_ylim(0, 1)
     world_ax.set_xlabel("Position")
     prob_ax.set_ylabel("Probability")
-    prob_ax.set_title("Histogram Localization With Measurements")
+    prob_ax.set_title("Histogram Localization With Measurements - 1D Environment")
     return rects, line,
 
 anim = animation.FuncAnimation(fig, update, n_cells, interval=50, init_func=init)
 plt.show()
-#anim.save("only_move.gif", writer="imagemagick")
+# anim.save("../../docs/images/hist-localization_1D.gif", writer="imagemagick")

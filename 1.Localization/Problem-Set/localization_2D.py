@@ -71,8 +71,8 @@ def move(p, U):
 
 #Create the animation
 fig, ax = plt.subplots()
-grid = ax.imshow(p, cmap="GnBu")
-line, = ax.plot([], [], 'r.')
+grid = ax.imshow(p, cmap="YlGnBu")
+line, = ax.plot([], [], 'r*', linewidth=10)
 
 i = m//2
 j = n//2
@@ -108,11 +108,11 @@ def animate(_):
 
 def init(): 
     '''initialize animation'''
-    ax.set_xlabel("Position X")
-    ax.set_ylabel("Position Y")
-    ax.set_title("Histogram Localization 2D")
+    ax.set_xlabel("x [m]")
+    ax.set_ylabel("y [m]")
+    ax.set_title("Histogram Localization With Measurements - 2D Environment")
     return grid, line,
 
 anim = animation.FuncAnimation(fig, animate, 300, interval=50, init_func=init)
 plt.show()
-#anim.save("localization_2d.gif", writer="imagemagick")
+# anim.save("../../docs/images/hist-localization_2D.gif", writer="imagemagick")
