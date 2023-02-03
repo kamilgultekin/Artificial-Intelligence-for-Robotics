@@ -3,8 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
-M = 100        #Rows
-N = 100        #Columns
+M = 30        #Rows
+N = 30        #Columns
 OBSTACLE_PROBABILITY = 0.3
 GRID = np.int8(np.random.random((M, N)) > (1 - OBSTACLE_PROBABILITY))
 START_NODE = (5, 5)
@@ -33,7 +33,7 @@ count = 0
 cost = 1
 
 fig, ax = plt.subplots()
-route, = plt.plot([], [], 'b-')
+route, = plt.plot([], [], 'b-', linewidth=5)
 
 def run_animation():
     anim_running = True
@@ -52,6 +52,8 @@ def run_animation():
         ax.plot(START_NODE[1], START_NODE[0], 'ro', label = 'Start')
         ax.plot(GOAL_NODE[1], GOAL_NODE[0], 'g*', label = 'Goal')
         ax.set_title('A* Algorithm', fontsize=20)
+        ax.set_ylabel('y [m]')
+        ax.set_xlabel('x [m]')
         ax.legend()
         return route,
 
@@ -64,8 +66,9 @@ def run_animation():
             route.insert(0, previous_node)
         return np.array(route)
 
-    def animate(_):
+    def animate(frame):
         global count, open
+        print(frame)
         if len(open) == 0:
             resign = True
             return route,
@@ -102,8 +105,8 @@ def run_animation():
 
     fig.canvas.mpl_connect('button_press_event', onClick)
 
-    anim = animation.FuncAnimation(fig, animate, 350, interval=50, init_func=init)
+    anim = animation.FuncAnimation(fig, animate, 30, interval=50, init_func=init)
+    # anim.save("../../docs/images/astar.gif", writer="imagemagick")
 
 run_animation()
 plt.show()
-#anim.save("a_star.gif", writer="imagemagick")

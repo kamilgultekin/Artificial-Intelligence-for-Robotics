@@ -186,7 +186,7 @@ lines[5][0].set_linewidth(5)
 lines[6][0].set_linewidth(5)
 lines[7][0].set_linewidth(5)
 sense_lines = [ax.plot([0, 0], [0, 0], 'b--', alpha=0.3) for _ in LANDMARKS]
-particle_dots = [ax.plot(0, 0, '.', markersize=1) for _ in range(N_PARTICLES)]
+particle_dots = [ax.plot(0, 0, '*', markersize=1) for _ in range(N_PARTICLES)]
 car = Car()
 car.set_noise(0, 0, 0)
 car.set_pose(0, 50, 0, 0)
@@ -212,10 +212,14 @@ def animate(frame):
 def init():
     ax.set_xlim(0, WORLD_SIZE)
     ax.set_ylim(0, WORLD_SIZE)
+    ax.set_xlabel('x [m]')
+    ax.set_ylabel('y [m]')
+    ax.set_title('Particle Filter Algorithm in 2D Environment with Car Model')
     for lm in LANDMARKS:
-        ax.plot(lm[0], lm[1], 'g*')
+        ax.plot(lm[0], lm[1], 'gx')
     return lines, particle_dots, sense_lines,
 
-anim = animation.FuncAnimation(fig, animate, 200, interval=1, init_func=init)
+anim = animation.FuncAnimation(fig, animate, 200, interval=100, init_func=init)
 plt.show()
-#anim.save("car.gif", writer="imagemagick")
+# anim.save("../../docs/images/particle-localization_car_1.gif", writer="imagemagick")
+# anim.save("../../docs/images/particle-localization_car_2.gif", writer="imagemagick")
