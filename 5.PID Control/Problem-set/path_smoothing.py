@@ -14,6 +14,19 @@ ORIGINAL += [[14, i] for i in range(10, 15)]
 ORIGINAL += [[i, 14] for i in range(15, 20)]
 ORIGINAL += [[19, i] for i in range(15, 20)]
 ORIGINAL = np.array(ORIGINAL, dtype=np.float64)
+
+# # Alternative implementation
+# ORIGINAL = [[0, 0]]
+# for i in range(0, 20, 3):
+#     ORIGINAL += [[0, i]]
+# for i in range(0, 20, 2):
+#     ORIGINAL += [[i, 20]]
+# for i in range(20, 0, -3):
+#     ORIGINAL += [[20, i]]
+# for i in range(20, 0, -2):
+#     ORIGINAL += [[i, 0]]
+# ORIGINAL = np.array(ORIGINAL, dtype=np.float64)
+
 N = len(ORIGINAL)
 print(ORIGINAL)
 smoothed = ORIGINAL.copy()
@@ -23,13 +36,16 @@ orig, = ax.plot(ORIGINAL[:, 0], ORIGINAL[:, 1], 'b-')
 smooth, = ax.plot(smoothed[:, 0], smoothed[:, 1], 'r--')
 
 def init():
-    ax.set_xlim(-1, 20)
-    ax.set_ylim(-1, 20)
-    plt.legend(('Original', 'Smoothed'), loc='upper left')
+    ax.set_xlim(-1, 21)
+    ax.set_ylim(-1, 21)
+    ax.set_title('Path Smoothing Algorithm', fontsize=20)
+    ax.set_ylabel('y [m]')
+    ax.set_xlabel('x [m]')
+    plt.legend(('Original', 'Smoothed'), loc='best')
     return orig, smooth,
 
 def animate(i):
-    # print(i)
+    print(i)
     i = i%(N - 2) + 1
     smoothed[i] += ALPHA*(ORIGINAL[i] - smoothed[i])
     smoothed[i] += BETA*(smoothed[i+1] + smoothed[i-1] - 2*smoothed[i])
@@ -37,6 +53,6 @@ def animate(i):
     smooth.set_ydata(smoothed[:, 1])
     return smooth, 
 
-anim = animation.FuncAnimation(fig, animate, 500, interval=20, init_func=init)
-plt.show()
-#anim.save("path_smoothing.gif", writer="imagemagick")
+anim = animation.FuncAnimation(fig, animate, 400, interval=100, init_func=init)
+# plt.show()
+anim.save("../../docs/images/path_smooth_anim.gif", writer="imagemagick")

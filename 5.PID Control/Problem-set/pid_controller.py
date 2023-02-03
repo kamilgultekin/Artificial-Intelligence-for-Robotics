@@ -188,7 +188,7 @@ def run(_):
     return lines, traj, des,
 
 def init():
-    ax.set_xlim(0, WORLD_SIZE)
+    ax.set_xlim(0, WORLD_SIZE+50)
     ax.set_ylim(-WORLD_SIZE/50, WORLD_SIZE/50)
     ax.set_xlabel('x axis [m]')
     ax.set_ylabel('y axis [m]')
@@ -198,3 +198,4 @@ def init():
 
 anim = animation.FuncAnimation(fig, run, 200, interval=100,init_func=init)
 plt.show()
+# anim.save("../../docs/images/pid_anim.gif", writer="imagemagick")

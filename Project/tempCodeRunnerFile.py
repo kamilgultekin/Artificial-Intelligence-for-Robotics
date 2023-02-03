@@ -1,5 +1,10 @@
- 10.0, 0.0, 2*pi / 30, 1.5)
-measurement_noise = 2.0*target.distance # VERY NOISY!!
-target.set_noise(0.0, 0.0, measurement_noise)
-
-hunter = robot(-10.0, -10.0, 0.0)
+Let's start by thinking about circular motion (well, really it's polygon motion
+# that is close to circular motion). Assume that Traxbot lives on 
+# an (x, y) coordinate plane and (for now) is sending you PERFECTLY ACCURATE sensor 
+# measurements. 
+#
+# With a few measurements you should be able to figure out the step size and the 
+# turning angle that Traxbot is moving with.
+# With these two pieces of information, you should be able to 
+# write a function that can predict Traxbot's next location.
+#

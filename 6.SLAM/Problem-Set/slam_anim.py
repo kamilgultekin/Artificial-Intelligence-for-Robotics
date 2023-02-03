@@ -8,7 +8,7 @@ WORLD_SIZE = 100.0
 MEASUREMENT_RANGE = 100.0
 MOTION_NOISE = 1.0
 MEASUREMENT_NOISE = 2.0
-N_LANDMARKS = 50
+N_LANDMARKS = 20
 LANDMARKS = np.array(
     [[uniform(0, WORLD_SIZE), uniform(0, WORLD_SIZE)]
      for _ in range(N_LANDMARKS)]
@@ -80,10 +80,10 @@ class Robot:
 
 fig, ax = plt.subplots()
 robot = Robot()
-ax.plot(LANDMARKS[:, 0], LANDMARKS[:, 1], 'g*', label='Actual Landmark')
-estimated_landmarks, = ax.plot([], [], 'k*', label='Estimated Landmark')
-actual_position, = ax.plot([], [], 'r.', label='Actual Position')
-estimated_position, = ax.plot([], [], 'b.', label='Estimated Position')
+ax.plot(LANDMARKS[:, 0], LANDMARKS[:, 1], 'gx', label='Actual Landmark',linewidth=5)
+estimated_landmarks, = ax.plot([], [], 'kx', label='Estimated Landmark',linewidth=5)
+actual_position, = ax.plot([], [], 'rs', label='Actual Position',linewidth=5)
+estimated_position, = ax.plot([], [], 'bs', label='Estimated Position',linewidth=5)
 actual_path, = ax.plot([], [], 'r--')
 estimated_path, = ax.plot([], [], 'b:')
 actual_values = []
@@ -92,7 +92,10 @@ estimated_values = []
 def init():
     ax.set_xlim(0, WORLD_SIZE)
     ax.set_ylim(0, WORLD_SIZE)
-    plt.legend(loc='upper left')
+    ax.set_title('Graph SLAM Algorithm',fontsize=20)
+    ax.set_xlabel('x [m]')
+    ax.set_ylabel('y [m]')
+    plt.legend(loc='upper left',fontsize=6)
     return (actual_position, estimated_position, estimated_landmarks,
             actual_path, estimated_path,)
 
@@ -115,6 +118,6 @@ def animate(i):
     return (actual_position, estimated_position, estimated_landmarks,
             actual_path, estimated_path,)
 
-anim = animation.FuncAnimation(fig, animate, 200, interval=50, init_func=init)
+anim = animation.FuncAnimation(fig, animate, 100, interval=100, init_func=init,repeat=False)
 plt.show()
-# anim.save('slam.gif', writer='imagemagick')
+# anim.save("../../docs/images/slam_anim.gif", writer="imagemagick")
