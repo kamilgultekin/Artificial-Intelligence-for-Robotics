@@ -60,8 +60,8 @@ for i in range(1, 500):
     measurements[i, :] = measurements[i-1, :] + motions[i, :2]
 
 f = gaussian_2d(X, Y, x, P)
-grid = ax.imshow(f, cmap="GnBu")
-dot, = ax.plot(0, 0, 'r.')
+grid = ax.imshow(f, cmap="YlGnBu")
+dot, = ax.plot(0, 0, 'r*',label='Robot Position')
 def animate(i):
     global x, P
     x, P = predict(x, motions[i].reshape(4, 1), P)
@@ -77,10 +77,13 @@ def animate(i):
 def init():
     ax.set_xlim(0, 100)
     ax.set_ylim(0, 100)
-    ax.set_xlabel(r"x")
-    ax.set_ylabel(r"y")
+    ax.set_xlabel("x [m]")
+    ax.set_ylabel("y [m]")
+    ax.set_title("Kalman Filter - 2D Grid based Environment")
+    ax.legend(loc='best')
+    ax.text(59, 83, 'Grid with Prediction', bbox={'facecolor': 'white', 'pad': 5})
     return grid, dot,
 
-anim = animation.FuncAnimation(fig, animate, 500, interval=50, init_func=init)
+anim = animation.FuncAnimation(fig, animate, 200, interval=50, init_func=init)
 plt.show()
-#anim.save("kalman_2d.gif", writer="imagemagick")
+# anim.save("../../docs/images/kalman-localization_2D.gif", writer="imagemagick")

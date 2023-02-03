@@ -28,24 +28,9 @@ x_pts = [i/10 for i in range(500)]
 #plt.ion()
 fig, ax = plt.subplots()
 
-'''for meas, move in zip(measurements, motion):
-    mean, var = predict(mean, var, move, motion_var)
-    y1 = [f(mean, var, x) for x in x_pts]
-    mean, var = update(mean, var, meas, measurement_var)
-    y2 = [f(meas, measurement_var, x) for x in x_pts]
-    y3 = [f(mean, var, x) for x in x_pts]
-    ax.cla()
-    ax.plot(x_pts, y1, 'r-')
-    ax.plot(x_pts, y2, 'g-')
-    ax.plot(x_pts, y3, 'b-')
-    ax.set_xlim(0, 50)
-    ax.set_ylim(0, 1)
-    ax.legend(("Prediction", "Measurement", "Update"))
-    plt.pause(1e-1)'''
-
-y1, = ax.plot(x_pts,x_pts)
-y2, = ax.plot(x_pts,x_pts)
-y3, = ax.plot(x_pts,x_pts)
+y1, = ax.plot(x_pts,x_pts,linewidth=4)
+y2, = ax.plot(x_pts,x_pts,linewidth=4)
+y3, = ax.plot(x_pts,x_pts,linewidth=4)
 def animate(i):
     global mean, var
     mean, var = predict(mean, var, motion[i], motion_var)
@@ -66,4 +51,4 @@ def init():
 
 anim = animation.FuncAnimation(fig, animate, 50, interval=100, init_func=init)
 plt.show()
-# anim.save("kalman_1d.gif", writer="imagemagick")
+# anim.save("../../docs/images/kalman-localization_1D.gif", writer="imagemagick")
