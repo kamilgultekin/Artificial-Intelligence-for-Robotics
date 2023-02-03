@@ -892,12 +892,18 @@ In this project, we will start with a simple version of this problem and gradual
 
 Let's start by thinking about circular motion (well, really it's polygon motion that is close to circular motion). Assume that Traxbot lives on an (x, y) coordinate plane and (for now) is sending you PERFECTLY ACCURATE sensor measurements.  With a few measurements you should be able to figure out the step size and the  turning angle that Traxbot is moving with. With these two pieces of information, you should be able to  write a function that can predict Traxbot's next location.  
 
-![1](/docs/videos/1.mp4)
+![1](/docs/videos/1.gif)
 
 Now we'll make the scenario a bit more realistic. Now Traxbot's sensor measurements are a bit noisy (though its motions are still completetly noise-free and it still moves in an almost-circle). You'll have to write a function that takes as input the next noisy (x, y) sensor measurement and outputs the best guess  for the robot's next position.  
-![2](/docs/videos/2.mp4)
-Now you'll actually track down and recover the runaway Traxbot.  In this step, your speed will be about twice as fast the runaway bot, which means that your bot's distance parameter will be about twice that of the runaway. You can move less than this parameter if you'd  like to slow down your bot near the end of the chase.   
-![3](/docs/videos/3.mp4)
-Again, you'll track down and recover the runaway Traxbot.  But this time, your speed will be about the same as the runaway bot.  This may require more careful planning than you used last time.
-![4](/docs/videos/3.mp4)
 
+![2](/docs/videos/2.gif)
+
+Now you'll actually track down and recover the runaway Traxbot.  In this step, your speed will be about twice as fast the runaway bot, which means that your bot's distance parameter will be about twice that of the runaway. You can move less than this parameter if you'd  like to slow down your bot near the end of the chase.   
+![3](/docs/videos/3.gif)
+
+Again, you'll track down and recover the runaway Traxbot.  But this time, your speed will be about the same as the runaway bot.  This may require more careful planning than you used last time.
+
+![4](/docs/videos/4.gif)
+
+# Conclusion and Final Words
+--
