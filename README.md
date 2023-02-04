@@ -1,5 +1,29 @@
 # Simulation and Visualization of Artificial Intelligence Application in Robotics
 
+- [Introduction](#introduction)
+- [Localization and Tracking](#localization-and-tracking)
+- [Histogram Filter](#histogram-filter)
+    - [Animation](#animation)
+- [Kalman Filters](#kalman-filters)
+    - [Animation](#animation-1)
+- [Particle Filters](#particle-filters)
+- [Motion Planning/Search Algorithms](#motion-planningsearch-algorithms)
+- [Breadth First Search Algorithm](#breadth-first-search-algorithm)
+- [A\* Search Algorithm](#a-search-algorithm)
+- [Dynamic Programming](#dynamic-programming)
+    - [Animation](#animation-3)
+- [PID Control](#pid-control)
+  - [Systematic Bias](#systematic-bias)
+  - [Parameter Optimization](#parameter-optimization)
+  - [Smoothing](#smoothing)
+      - [Animation](#animation-4)
+- [SLAM](#slam)
+    - [Animation](#animation-5)
+- [Practice Exam](#practice-exam)
+- [Project Runaway Robot](#project-runaway-robot)
+- [Conclusion and Final Words](#conclusion-and-final-words)
+- [Special Thanks](#special-thanks)
+
 ## Introduction
 This project is about various robotic algorithms used in mobile robots. A mobile robot is a machine capable of moving in any environment, either by being propelled by wheels, legs, or any other means. A mobile robot is a machine controlled by software that use sensors and other technology to identify its surroundings and move around its environment. Mobile robots function using a combination of artificial intelligence (AI) and physical robotic elements, such as wheels, tracks and legs. Mobile robots are becoming increasingly popular across different business sectors. They are used to assist with work processes and even accomplish tasks that are impossible or dangerous for human workers. It is designed to perform tasks without human intervention. In the context of this project, a mobile robot is represented by a bicycle/car model.
 
