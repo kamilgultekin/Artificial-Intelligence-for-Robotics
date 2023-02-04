@@ -1,6 +1,6 @@
 # Simulation and Visualization of Artificial Intelligence Application in Robotics
 
-## Introduction
+## Introduction
 This project is about various robotic algorithms used in mobile robots. A mobile robot is a machine capable of moving in any environment, either by being propelled by wheels, legs, or any other means. A mobile robot is a machine controlled by software that use sensors and other technology to identify its surroundings and move around its environment. Mobile robots function using a combination of artificial intelligence (AI) and physical robotic elements, such as wheels, tracks and legs. Mobile robots are becoming increasingly popular across different business sectors. They are used to assist with work processes and even accomplish tasks that are impossible or dangerous for human workers. It is designed to perform tasks without human intervention. In the context of this project, a mobile robot is represented by a bicycle/car model.
 
 A bicycle/car model is a simplified model of a two bicycle that is used to represent a mobile robot in many robotics simulations and control algorithms. The model assumes that the robot has four wheels and moves in a plane. It is a commonly used model for studying the control and localization of mobile robots. You can see the model below:
@@ -906,4 +906,14 @@ Again, you'll track down and recover the runaway Traxbot.  But this time, your s
 ![4](/docs/videos/4.gif)
 
 # Conclusion and Final Words
---
+In this project, we have implemented a variety of robotics algorithms and techniques, including localization and tracking using histogram filter, Kalman filter, and particle filter, search and motion planning, PID control, and SLAM. All of these algorithms and techniques are important building blocks in the field of robotics, and by implementing them, you have gained a deeper understanding of how they work and how they can be applied to real-world problems.
+
+It is important to note that these algorithms are not the only ones used in robotics, and there is a vast amount of research and development in this field. However, by understanding and implementing these algorithms, you have laid a solid foundation for further exploration and growth in the field.
+
+The field of robotics is rapidly evolving, and new developments are being made all the time. As you continue your journey in robotics, keep an open mind and be willing to experiment with new techniques and approaches. With your understanding of the fundamental algorithms and techniques, you will be well-equipped to tackle the challenges of tomorrow.
+
+In conclusion, this project has been an exciting and educational journey, and we hope that it has inspired you to continue your exploration of robotics and other related fields. Keep learning, keep experimenting, and never stop pushing the boundaries of what is possible.
+
+# Special Thanks
+
+All the methods I have applied here are a result of what I learned in the [Artificial Intelligence for Robotics](https://www.udacity.com/course/artificial-intelligence-for-robotics--cs373) course given by Sebastian Thrun, which I studied on the Udacity platform. I would like to thank everyone who prepared this wonderful course. I also got the idea to visualize these algorithms from the repository [daniel-s-ingram/ai_for_robotics](https://github.com/daniel-s-ingram/ai_for_robotics), which I found while browsing GitHub. 
